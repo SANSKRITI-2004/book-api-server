@@ -1,0 +1,73 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Book Manager</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input, button { margin: 5px; padding: 5px; }
+  </style>
+</head>
+<body>
+  <h1>📚 Book Manager</h1>
+
+  <h3>Add Book</h3>
+  <input id="title" placeholder="Title" />
+  <input id="author" placeholder="Author" />
+  <input id="year" placeholder="Year" />
+  <button onclick="addBook()">Add</button>
+
+  <h3>All Books</h3>
+  <div id="books"></div>
+
+  <script>
+    const API = 'http://localhost:5000/api/books';
+
+    async function fetchBooks() {
+      const res = await fetch(API);
+      const data = await res.json();
+      document.getElementById('books').innerHTML = data.map(book => `
+        <div>
+          <b>${book.title}</b> by ${book.author} (${book.year})
+          <button onclick="deleteBook('${book._id}')">❌</button>
+          <button onclick="editBook('${book._id}', '${book.title}', '${book.author}', ${book.year})">✏️</button>
+        </div>
+      `).join('');
+    }
+
+    async function addBook() {
+      const book = {
+        title: document.getElementById('title').value,
+        author: document.getElementById('author').value,
+        year: parseInt(document.getElementById('year').value)
+      };
+      await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(book)
+      });
+      fetchBooks();
+    }
+
+    async function deleteBook(id) {
+      await fetch(`${API}/${id}`, { method: 'DELETE' });
+      fetchBooks();
+    }
+
+    async function editBook(id, title, author, year) {
+      const newYear = prompt("Update year:", year);
+      if (newYear !== null) {
+        await fetch(`${API}/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, author, year: parseInt(newYear) })
+        });
+        fetchBooks();
+      }
+    }
+
+    fetchBooks();
+  </script>
+</body>
+</html>
