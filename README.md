@@ -20,6 +20,4 @@ It allows users to perform CRUD operations on a list of books.
 
 ### 1. Clone the Repository
 
-```bash
-git clone https://github.com/your-username/book-api-server.git
-cd book-api-server
+![Test Coverage](./assets/coverage-screenshot.png)
