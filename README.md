@@ -20,4 +20,4 @@ It allows users to perform CRUD operations on a list of books.
 
 ### 1. Clone the Repository
 
-![Test Coverage](./assets/coverage-screenshot.png)
+![Test Coverage](./assets/coverage.png)
