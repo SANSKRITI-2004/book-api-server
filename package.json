@@ -5,10 +5,17 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "jest --detectOpenHandles --forceExit --coverage"
   },
-  "keywords": ["books", "api", "express", "mongodb", "crud"],
-  "author": "Your Name",
+  "keywords": [
+    "books",
+    "api",
+    "express",
+    "mongodb",
+    "crud"
+  ],
+  "author": "Sanskriti",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
@@ -17,6 +24,14 @@
     "mongoose": "^8.16.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "jest": "^30.0.2",
+    "mockingoose": "^2.16.2",
+    "mongodb-memory-server": "^10.1.4",
+    "node-mocks-http": "^1.17.2",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.1"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }

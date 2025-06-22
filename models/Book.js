@@ -1,10 +1,10 @@
- const mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
 const bookSchema = new mongoose.Schema({
-  title: { type: String, required: true },
+  title: String,
   author: String,
   publishedYear: Number
 }, { timestamps: true });
 
-module.exports = mongoose.model('Book', bookSchema);
-
+// ✅ Prevent model overwrite error
+module.exports = mongoose.models.Book || mongoose.model('Book', bookSchema);
