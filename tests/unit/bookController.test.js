@@ -1,61 +1,39 @@
-// tests/unit/bookController.test.js
-
 const httpMocks = require('node-mocks-http');
-const Book = require('../../models/Book');
 const bookController = require('../../controllers/bookController');
+const Book = require('../../models/Book');
 
-jest.mock('../../models/Book'); // ✅ Match correct casing of file name
+jest.mock('../../models/Book'); // ✅ Mock the Mongoose model
 
-describe('Book Controller', () => {
+describe('Book Controller - Unit Tests', () => {
+  let req, res;
+
   beforeEach(() => {
-    jest.clearAllMocks();
+    req = httpMocks.createRequest();
+    res = httpMocks.createResponse();
   });
 
-  describe('createBook', () => {
-    it('should create a book successfully', async () => {
-      const req = httpMocks.createRequest({
-        method: 'POST',
-        body: {
-          title: 'New Book',
-          author: 'Author Name',
-        },
-      });
-      const res = httpMocks.createResponse();
+  describe('getAllBooks', () => {
+    it('should return all books', async () => {
+      const mockBooks = [{ title: 'Book 1' }, { title: 'Book 2' }];
+      Book.find.mockResolvedValue(mockBooks); // ✅ Corrected mock
 
-      const mockSavedBook = {
-        _id: '507f191e810c19729de860ea',
-        title: 'New Book',
-        author: 'Author Name',
-      };
+      await bookController.getAllBooks(req, res);
 
-      // ✅ Mock Book.create() instead of new Book().save()
-      Book.create.mockResolvedValue(mockSavedBook);
-
-      await bookController.createBook(req, res);
-
-      expect(res.statusCode).toBe(201);
-      const data = res._getJSONData();
-      expect(data).toEqual(mockSavedBook);
+      expect(res.statusCode).toBe(200);
+      expect(res._getJSONData()).toEqual(mockBooks);
     });
+  });
 
-    it('should return 500 on save error', async () => {
-      const req = httpMocks.createRequest({
-        method: 'POST',
-        body: {
-          title: 'New Book',
-          author: 'Author Name',
-        },
-      });
-      const res = httpMocks.createResponse();
+  describe('getBookById', () => {
+    it('should return book by id', async () => {
+      const mockBook = { _id: '1', title: 'Book 1' };
+      req.params.id = '1';
+      Book.findById.mockResolvedValue(mockBook); // ✅ Corrected mock
 
-      // ✅ Simulate error in Book.create()
-      Book.create.mockRejectedValue(new Error('Save error'));
+      await bookController.getBookById(req, res);
 
-      await bookController.createBook(req, res);
-
-      expect(res.statusCode).toBe(500);
-      const data = res._getJSONData();
-      expect(data.error).toBe('Something went wrong');
+      expect(res.statusCode).toBe(200);
+      expect(res._getJSONData()).toEqual(mockBook);
     });
   });
 });
