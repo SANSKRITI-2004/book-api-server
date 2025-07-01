@@ -1,0 +1,35 @@
+version: "3.8"
+services:
+    mongo:
+        image: mongo:6.0
+        container_name: mongo
+        ports:
+            - "27017:27017"
+        networks:
+            - keploy-network
+    app:
+        build: .
+        container_name: app
+        environment:
+            - MONGO_URI=mongodb://mongo:27017/books
+            - PORT=3000
+        ports:
+            - "3000:3000"
+        depends_on:
+            - mongo
+        networks:
+            - keploy-network
+    keploy:
+        image: ghcr.io/keploy/keploy:latest
+        container_name: keploy
+        depends_on:
+            - app
+        command: ["record", "-c", "npm start", "--proxy-port", "8080", "--container-name", "app", "--network-name", "keploy-network"]
+        ports:
+            - "8080:8080"
+        networks:
+            - keploy-network
+        privileged: true
+networks:
+    keploy-network:
+        external: true

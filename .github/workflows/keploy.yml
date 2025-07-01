@@ -1,0 +1,35 @@
+name: Keploy API Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  keploy-test:
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+      app:
+        build: .
+        ports:
+          - 3000:3000
+        env:
+          MONGO_URI: mongodb://mongo:27017/books
+          PORT: 3000
+        options: --network-alias app
+      keploy:
+        image: ghcr.io/keploy/keploy:latest
+        ports:
+          - 8080:8080
+        options: --network-alias keploy
+        command: ["record", "--proxy-port", "8080", "--container-name", "app", "--network-name", "github_network"]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Keploy Tests
+        run: |
+          docker exec -it keploy keploy test -c .

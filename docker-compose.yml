@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: mongo
+    ports:
+      - "27017:27017"
+
+  app:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/books
+      - PORT=3000
+    depends_on:
+      - mongo
+    networks:
+      - keploy-net
+
+  keploy:
+    image: ghcr.io/keploy/keploy:latest
+    depends_on:
+      - app
+    command: ["record", "--proxy-port", "8080", "--app-host", "app", "--app-port", "3000"]
+    ports:
+      - "8080:8080"
+    networks:
+      - keploy-net
+
+networks:
+  keploy-net:
+    driver: bridge
